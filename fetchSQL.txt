@@ -1,17 +1,23 @@
-SELECT f.Date, f.name, f.rank, f.count
+//SQL Query to find the top 5 Brands by receipts scanned for the most recent month and comparing them to the top 5 Brands by receipt 
+//scanned from the previous month
+
+SELECT f.Date, f.Brand, f.rank, f.count
 FROM
-	(SELECT e.Date. e.name, rank() over (partition by e.Date order by e.count desc) as rank, e.count
+	(SELECT e.Date. e.Brand, rank() over (partition by e.Date order by e.count desc) as rank, e.count
 	FROM
-		(SELECT d.Date, d.name, COUNT(d.name) as count 
+		//Taking the previous table and adding the count of each brand 
+		(SELECT d.Date, d.Brand, COUNT(d.Brand) as count 
 		FROM 
-			(SELECT FORMAT(DATEADD(SECOND, cast(a.dateScanned as bigint) / 1000, '19700101'), 'yyyy-MM') as Date, c.name
+			//Table creating date as date month, and the brand
+			(SELECT FORMAT(DATEADD(SECOND, cast(a.dateScanned as bigint) / 1000, '19700101'), 'yyyy-MM') as Date, c.name as Brand
 			FROM (SELECT receiptID, dateScanned from receipts) a
 			INNER JOIN (SELECT receiptID, barcode FROM RewardsReceiptItemList) b 
 			ON a.receiptID = b.receiptID
 			INNER JOIN (SELECT barcode, name FROM Brands) c
 			ON b.barcode = c.barcode ) d
-		GROUP BY d.Date, d.name ) e
+		GROUP BY d.Date, d.Brand ) e
 	WHERE e.Date IN 
+		//Selecting the two most recent months
 		(SELECT DISTINCT TOP 2 FORMAT(DATEADD(SECOND, cast(a.dateScanned as bigint) / 1000, '19700101'), 'yyyy-MM') as Date 
 		FROM (SELECT dateScanned FROM receipts) a ORDER BY date DESC)) f
 WHERE rank <=5
