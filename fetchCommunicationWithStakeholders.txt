@@ -1,0 +1,18 @@
+Hi,
+
+I wanted to reach out with a follow up regarding the investigation. I have some questions about the data, and I also found some concerns with the data that I think are worth addressing, especially if we are planning on scaling in the future..
+
+One of the first questions I have about the data is why are there so many receipts that don't have any items purchased, or all items are listed as “ITEM NOT FOUND”. Similarly, why are there so many “Test brands” in the Brands table? Is there a better way to handle these receipts and these test brands? 
+
+On a different note, while exploring the data, there are several branded items on individual receipts that do not have a corresponding brand from the brands table. I discovered this issue while comparing the brand IDs of the individual items purchased with the brand IDs from the brands table. In the case of “Heinz”, the record exists in the brands table, but the ID is different in the brands table and the individual items on the receipt. 
+
+To resolve these issues, I would need to know the following. For the missing brands, I would need to know the brand information to update the table, or know why they were excluded from the table originally. Additionally, in the case of Heinz, I would need to know if the values are supposed to be different between the receipt IDs and the brands table, and also which ID, either the one in the receipts or brands table, is the correct ID to use if they are supposed to be the same.
+
+Beyond solving this issue, there are also issues related to optimizing the data we are trying to create. In order to properly optimize, we need to know what we are optimizing for, and this can be done by looking at which queries or operations are the most important and time sensitive. If we are mainly querying, we want to improve the latency of the execution of queries and if we are more focused on manipulations to the data, we should focus on optimizing for throughput.
+
+When scaling, there are several potential performance concerns that I have. The main issue has to do with the volume of data and the ability to process and query it efficiently. There are several potential options to address these concerns. One of the main methods is to denormalize the data. As of right now, we have several smaller tables that are joined onto bigger tables, and we can denormalize them to increase the speed of querying.  Since the receipts are the largest source of data, we could partition the data based on createdDate and allow for parallelization. If there are several common queries that are frequently run, we can also apply materialized views to those queries, so they are quickly accessible. This will help save time when larger queries are performed. We are using more resources, but we are getting better performance. 
+
+Please let me know your thoughts and any questions you may have. 
+
+Best,
+Nishant 
